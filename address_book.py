@@ -32,6 +32,9 @@ class Name(Field):
     def __init__(self, value: str):
         if not value or not isinstance(value, str):
             raise ValidationError("Invalid name")
+        # Now name can not contain space-like characters
+        if any(char.isspace() for char in value):
+            raise ValidationError("Name cannot contain spaces")
         super().__init__(value)
 
 
@@ -72,7 +75,7 @@ class Birthday(Field):
             return False
         return self.value.month == 2 and self.value.day == 29
 
-    def next_congritulation_date(self) -> date | None:
+    def next_congratulation_date(self) -> date | None:
         '''
             Returns the next birthday celebration date
         '''
@@ -88,8 +91,11 @@ class Birthday(Field):
 
         # If next birthday is in the past, move to next year
         if next_birthday < today:
-            if self.is_29th_february() and Birthday.is_leap_year(today.year + 1):
-                next_birthday = self.value.replace(year=today.year + 1, day=29)
+            if self.is_29th_february():
+                if Birthday.is_leap_year(today.year + 1):
+                    next_birthday = next_birthday.replace(year=today.year + 1, day=29)
+                else:
+                    next_birthday = next_birthday.replace(year=today.year + 1, day=28)
             else:
                 next_birthday = next_birthday.replace(year=today.year + 1)
 
@@ -198,7 +204,7 @@ class AddressBook(UserDict):
             if not record.birthday:
                 continue
 
-            congratulation_day = record.birthday.next_congritulation_date()
+            congratulation_day = record.birthday.next_congratulation_date()
 
             if 0 <= (congratulation_day - today).days < days_ahead:
                 upcoming_birthdays.append({

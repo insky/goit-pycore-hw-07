@@ -3,7 +3,7 @@ import sys
 from address_book import AddressBook, Record, ValidationError
 
 
-def parse_input(user_input):
+def parse_input(user_input: str) -> tuple[str | None, list[str]]:
     '''
         Parses user input into command and arguments
     '''
@@ -168,7 +168,7 @@ def handle_upcoming_birthdays(book: AddressBook):
 
     result = []
     for item in upcoming:
-        result.append(f"{item['name']}: {item['congratulation_day']}")
+        result.append(f"{item['name']}: {item['congratulation_day'].strftime('%d.%m.%Y')}")
     return "\n".join(result)
 
 
