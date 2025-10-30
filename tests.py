@@ -21,7 +21,15 @@ from handlers import (
 )
 
 
-class TestFieldClasses(unittest.TestCase):
+class TestCaseWithMockDatetime(unittest.TestCase):
+    ''' Base TestCase class with datetime mocking utility '''
+    def _setup_datetime_mock(self, mock_datetime_class, year, month, day):
+        mock_datetime_class.now.return_value = datetime(year, month, day)
+        mock_datetime_class.strptime = datetime.strptime
+        mock_datetime_class.timedelta = timedelta
+
+
+class TestFieldClasses(TestCaseWithMockDatetime):
     ''' Test cases for Field base class and its subclasses '''
 
     def test_field_creation(self):
@@ -117,12 +125,9 @@ class TestFieldClasses(unittest.TestCase):
         self.assertFalse(birthday_regular.is_29th_february())
 
     @patch('address_book.datetime')
-    def test_birthday_next_congratulation_date_regular(self, mock_datetime_module):
+    def test_birthday_next_congratulation_date_regular(self, mock_datetime_class):
         ''' Test next congratulation date for regular birthday '''
-        mock_datetime_module.now.return_value = datetime(2025, 10, 30)
-        mock_datetime_module.strptime = datetime.strptime
-        mock_datetime_module.timedelta = timedelta
-
+        self._setup_datetime_mock(mock_datetime_class, 2025, 10, 30)
         birthday = Birthday("15.10.1990")
         next_date = birthday.next_congratulation_date()
         expected = date(2026, 10, 15)  # Next year since Oct 15 is past
@@ -131,10 +136,7 @@ class TestFieldClasses(unittest.TestCase):
     @patch('address_book.datetime')
     def test_birthday_next_congratulation_date_future(self, mock_datetime_class):
         ''' Test next congratulation date when birthday is in future '''
-        mock_datetime_class.now.return_value = datetime(2025, 10, 1)
-        mock_datetime_class.strptime = datetime.strptime
-        mock_datetime_class.timedelta = timedelta
-
+        self._setup_datetime_mock(mock_datetime_class, 2025, 10, 1)
         birthday = Birthday("15.10.1990")
         next_date = birthday.next_congratulation_date()
         expected = date(2025, 10, 15)  # This year
@@ -143,10 +145,7 @@ class TestFieldClasses(unittest.TestCase):
     @patch('address_book.datetime')
     def test_birthday_next_congratulation_date_weekend_adjustment(self, mock_datetime_class):
         ''' Test weekend adjustment for birthday celebrations '''
-        mock_datetime_class.now.return_value = datetime(2025, 1, 1)
-        mock_datetime_class.strptime = datetime.strptime
-        mock_datetime_class.timedelta = timedelta
-
+        self._setup_datetime_mock(mock_datetime_class, 2025, 1, 1)
         birthday = Birthday("25.10.1990")  # Saturday
         next_date = birthday.next_congratulation_date()
         expected = date(2025, 10, 27)  # Monday after Saturday
@@ -155,10 +154,7 @@ class TestFieldClasses(unittest.TestCase):
     @patch('address_book.datetime')
     def test_birthday_leap_year_29_february_leap_year(self, mock_datetime_class):
         ''' Test 29 Feb birthday in leap year '''
-        mock_datetime_class.now.return_value = datetime(2024, 4, 1)  # 2024 is leap year
-        mock_datetime_class.strptime = datetime.strptime
-        mock_datetime_class.timedelta = timedelta
-
+        self._setup_datetime_mock(mock_datetime_class, 2024, 4, 1)  # 2024 is leap year
         birthday = Birthday("29.02.2000")
         next_date = birthday.next_congratulation_date()
         expected = date(2025, 2, 28)  # Friday 28 Feb in leap year
@@ -167,10 +163,7 @@ class TestFieldClasses(unittest.TestCase):
     @patch('address_book.datetime')
     def test_birthday_leap_year_29_february_leap_year_future(self, mock_datetime_class):
         ''' Test 29 Feb birthday in leap year in future '''
-        mock_datetime_class.now.return_value = datetime(2024, 1, 1)  # 2024 is leap year
-        mock_datetime_class.strptime = datetime.strptime
-        mock_datetime_class.timedelta = timedelta
-
+        self._setup_datetime_mock(mock_datetime_class, 2024, 1, 1)  # 2024 is leap year
         birthday = Birthday("29.02.2000")
         next_date = birthday.next_congratulation_date()
         expected = date(2024, 2, 29)  # Thursday 29 Feb in leap year
@@ -179,16 +172,14 @@ class TestFieldClasses(unittest.TestCase):
     @patch('address_book.datetime')
     def test_birthday_leap_year_29_february_non_leap_year(self, mock_datetime_class):
         ''' Test 29 Feb birthday in non-leap year '''
-        mock_datetime_class.now.return_value = datetime(2025, 1, 1)  # 2025 is not leap year
-        mock_datetime_class.strptime = datetime.strptime
-        mock_datetime_class.timedelta = timedelta
-
+        self._setup_datetime_mock(mock_datetime_class, 2025, 1, 1)  # 2025 is not leap year
         birthday = Birthday("29.02.2000")
         next_date = birthday.next_congratulation_date()
         expected = date(2025, 2, 28)  # Friday 28 Feb in non-leap year
         self.assertEqual(next_date, expected)
 
-class TestRecord(unittest.TestCase):
+
+class TestRecord(TestCaseWithMockDatetime):
     ''' Test cases for Record class '''
 
     def test_record_creation(self):
@@ -310,7 +301,7 @@ class TestRecord(unittest.TestCase):
             record.add_birthday("invalid")
 
 
-class TestAddressBook(unittest.TestCase):
+class TestAddressBook(TestCaseWithMockDatetime):
     ''' Test cases for AddressBook class '''
 
     def setUp(self):
@@ -352,10 +343,7 @@ class TestAddressBook(unittest.TestCase):
     @patch('address_book.datetime')
     def test_get_upcoming_birthdays(self, mock_datetime_class):
         ''' Test getting upcoming birthdays '''
-        mock_datetime_class.now.return_value = datetime(2025, 10, 30)
-        mock_datetime_class.strptime = datetime.strptime
-        mock_datetime_class.timedelta = timedelta
-
+        self._setup_datetime_mock(mock_datetime_class, 2025, 10, 30)
         record = Record("John")
         record.add_birthday("31.10.1990")  # Oct 31 - 1 day from now
         self.book.add_record(record)
@@ -371,10 +359,7 @@ class TestAddressBook(unittest.TestCase):
     @patch('address_book.datetime')
     def test_get_upcoming_birthdays_weekend_adjustment(self, mock_datetime_class):
         ''' Test weekend adjustment in upcoming birthdays '''
-        mock_datetime_class.now.return_value = datetime(2025, 10, 21)
-        mock_datetime_class.strptime = datetime.strptime
-        mock_datetime_class.timedelta = timedelta
-
+        self._setup_datetime_mock(mock_datetime_class, 2025, 10, 21)
         record = Record("John")
         record.add_birthday("25.10.1990")  # Oct 25 - Saturday
         self.book.add_record(record)
@@ -390,7 +375,7 @@ class TestAddressBook(unittest.TestCase):
         self.assertEqual(len(upcoming), 0)
 
 
-class TestParseInput(unittest.TestCase):
+class TestParseInput(TestCaseWithMockDatetime):
     ''' Test cases for parse_input function '''
 
     def test_parse_input_valid_command(self):
@@ -418,7 +403,7 @@ class TestParseInput(unittest.TestCase):
         self.assertEqual(args, [])
 
 
-class TestHandlers(unittest.TestCase):
+class TestHandlers(TestCaseWithMockDatetime):
     ''' Test cases for handler functions '''
 
     def setUp(self):
@@ -535,10 +520,7 @@ class TestHandlers(unittest.TestCase):
     @patch('address_book.datetime')
     def test_handle_upcoming_birthdays_with_upcoming(self, mock_datetime_class):
         ''' Test showing upcoming birthdays '''
-        mock_datetime_class.now.return_value = datetime(2025, 10, 25)
-        mock_datetime_class.strptime = datetime.strptime
-        mock_datetime_class.timedelta = timedelta
-
+        self._setup_datetime_mock(mock_datetime_class, 2025, 10, 25)
         self.book.data["John"].add_birthday("30.10.1990")
         result = handle_upcoming_birthdays(self.book)
         self.assertIn("John:", result)
@@ -546,10 +528,7 @@ class TestHandlers(unittest.TestCase):
     @patch('address_book.datetime')
     def test_handle_upcoming_birthdays_none(self, mock_datetime_class):
         ''' Test showing upcoming birthdays when none '''
-        mock_datetime_class.now.return_value = datetime(2023, 10, 25)
-        mock_datetime_class.strptime = datetime.strptime
-        mock_datetime_class.timedelta = timedelta
-
+        self._setup_datetime_mock(mock_datetime_class, 2023, 10, 25)
         self.book.data["John"].add_birthday("15.11.1990")  # More than 7 days away
         result = handle_upcoming_birthdays(self.book)
         self.assertEqual(result, "No upcoming birthdays.")
