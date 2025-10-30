@@ -60,8 +60,8 @@ class Birthday(Field):
     def __str__(self):
         return self.value.strftime("%d.%m.%Y")
 
-    @classmethod
-    def is_leap_year(cls, year: int) -> bool:
+    @staticmethod
+    def is_leap_year(year: int) -> bool:
         '''
             Checks if a year is a leap year
         '''
@@ -91,6 +91,7 @@ class Birthday(Field):
 
         # If next birthday is in the past, move to next year
         if next_birthday < today:
+            # special case for 29th February
             if self.is_29th_february():
                 if Birthday.is_leap_year(today.year + 1):
                     next_birthday = next_birthday.replace(year=today.year + 1, day=29)

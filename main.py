@@ -13,7 +13,7 @@ def main():
     while True:
         try:
             user_input = input("\nEnter a command: ")
-        except KeyboardInterrupt:
+        except (KeyboardInterrupt, EOFError):
             print("\n- Goodbye!")
             break
 
