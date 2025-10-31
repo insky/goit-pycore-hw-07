@@ -1,12 +1,11 @@
-''' Main module for the assistant bot '''
+"""Main module for the assistant bot."""
+
 from handlers import commands, parse_input
 from address_book import AddressBook
 
 
 def main():
-    '''
-        Main function to run the assistant bot
-    '''
+    """Main function to run the assistant bot."""
     book = AddressBook()
 
     print("Welcome to the assistant bot!")
@@ -29,6 +28,7 @@ def main():
             continue
 
         print('-', func(book, *args))
+
 
 if __name__ == "__main__":
     main()

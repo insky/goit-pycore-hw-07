@@ -1,12 +1,19 @@
-''' Handlers for user commands '''
+"""Handlers for user commands."""
+
 import sys
 from address_book import AddressBook, Record, ValidationError
 
 
 def parse_input(user_input: str) -> tuple[str | None, list[str]]:
-    '''
-        Parses user input into command and arguments
-    '''
+    """
+    Parses user input into command and arguments.
+
+    Args:
+        user_input (str): The user input string.
+
+    Returns:
+        tuple[str | None, list[str]]: A tuple containing the command and arguments.
+    """
     parts = user_input.split()
     if not parts:
         return None, []
@@ -16,9 +23,21 @@ def parse_input(user_input: str) -> tuple[str | None, list[str]]:
 
 
 def input_error(func):
-    '''
-        Decorator for handling input errors
-    '''
+    """
+    Decorator for handling input errors.
+
+    Args:
+        func: The function to wrap.
+
+    Returns:
+        The wrapped function.
+
+    Raises:
+        TypeError: If invalid number of parameters.
+        KeyError: If contact not found.
+        ValueError: If invalid input.
+        ValidationError: If validation fails.
+    """
     def wrapper(*args):
         try:
             return func(*args)
@@ -35,26 +54,41 @@ def input_error(func):
 
 @input_error
 def handle_hello(_: AddressBook):
-    '''
-        Greets the user
-    '''
+    """
+    Greets the user.
+
+    Args:
+        _: The address book (unused).
+
+    Returns:
+        str: The greeting message.
+    """
     return "How can I help you?"
 
 
 @input_error
 def handle_exit(_: AddressBook):
-    '''
-        Exits the program
-    '''
+    """
+    Exits the program.
+
+    Args:
+        _: The address book (unused).
+    """
     print("Goodbye!")
     sys.exit(0)
 
 
 @input_error
 def handle_help(_: AddressBook):
-    '''
-        Returns help text with available commands
-    '''
+    """
+    Returns help text with available commands.
+
+    Args:
+        _: The address book (unused).
+
+    Returns:
+        str: The help text.
+    """
     help_text = """Available commands:
     hello - Greet the bot
     help - Show this help message
@@ -72,9 +106,17 @@ def handle_help(_: AddressBook):
 
 @input_error
 def handle_add(book: AddressBook, name: str, phone: str):
-    '''
-        Adds a new contact or update existing contact's phone number
-    '''
+    """
+    Adds a new contact or update existing contact's phone number.
+
+    Args:
+        book (AddressBook): The address book.
+        name (str): The contact name.
+        phone (str): The phone number.
+
+    Returns:
+        str: The result message.
+    """
     record = book.find(name)
     message = "Contact updated."
 
@@ -91,9 +133,18 @@ def handle_add(book: AddressBook, name: str, phone: str):
 
 @input_error
 def handle_change(book: AddressBook, name: str, old_phone: str, new_phone: str):
-    '''
-        Changes an existing contact's phone number
-    '''
+    """
+    Changes an existing contact's phone number.
+
+    Args:
+        book (AddressBook): The address book.
+        name (str): The contact name.
+        old_phone (str): The old phone number.
+        new_phone (str): The new phone number.
+
+    Returns:
+        str: The result message.
+    """
     record = book.find(name)
     if record is None:
         return "Contact not found."
@@ -104,9 +155,16 @@ def handle_change(book: AddressBook, name: str, old_phone: str, new_phone: str):
 
 @input_error
 def handle_phone(book: AddressBook, name: str):
-    '''
-        Gets the phone number of a contact
-    '''
+    """
+    Gets the phone number of a contact.
+
+    Args:
+        book (AddressBook): The address book.
+        name (str): The contact name.
+
+    Returns:
+        str: The phone numbers or error message.
+    """
     record = book.find(name)
     if record is None:
         return "Contact not found."
@@ -116,9 +174,15 @@ def handle_phone(book: AddressBook, name: str):
 
 @input_error
 def handle_all(book: AddressBook):
-    '''
-        Lists all contacts
-    '''
+    """
+    Lists all contacts.
+
+    Args:
+        book (AddressBook): The address book.
+
+    Returns:
+        str: The list of contacts or message if none.
+    """
     if not book.data:
         return "No contacts found."
 
@@ -131,9 +195,17 @@ def handle_all(book: AddressBook):
 
 @input_error
 def handle_add_birthday(book: AddressBook, name: str, birthday: str):
-    '''
-        Adds a birthday for a contact
-    '''
+    """
+    Adds a birthday for a contact.
+
+    Args:
+        book (AddressBook): The address book.
+        name (str): The contact name.
+        birthday (str): The birthday in DD.MM.YYYY format.
+
+    Returns:
+        str: The result message.
+    """
     record = book.find(name)
     if record is None:
         return "Contact not found."
@@ -144,9 +216,16 @@ def handle_add_birthday(book: AddressBook, name: str, birthday: str):
 
 @input_error
 def handle_show_birthday(book: AddressBook, name: str):
-    '''
-        Shows the birthday of a contact
-    '''
+    """
+    Shows the birthday of a contact.
+
+    Args:
+        book (AddressBook): The address book.
+        name (str): The contact name.
+
+    Returns:
+        str: The birthday or error message.
+    """
     record = book.find(name)
     if record is None:
         return "Contact not found."
@@ -159,9 +238,15 @@ def handle_show_birthday(book: AddressBook, name: str):
 
 @input_error
 def handle_upcoming_birthdays(book: AddressBook):
-    '''
-        Shows contacts with upcoming birthdays
-    '''
+    """
+    Shows contacts with upcoming birthdays.
+
+    Args:
+        book (AddressBook): The address book.
+
+    Returns:
+        str: The list of upcoming birthdays or message if none.
+    """
     upcoming = book.get_upcoming_birthdays()
     if not upcoming:
         return "No upcoming birthdays."
