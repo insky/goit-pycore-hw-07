@@ -47,6 +47,8 @@ def input_error(func):
             return "Contact not found."
         except ValueError:
             return "Invalid input. Please enter the correct data."
+        except AttributeError:
+            return "Contact not found."
         except ValidationError as ve:
             return str(ve)
     return wrapper
@@ -146,10 +148,7 @@ def handle_change(book: AddressBook, name: str, old_phone: str, new_phone: str):
         str: The result message.
     """
     record = book.find(name)
-    if record is None:
-        return "Contact not found."
-
-    record.edit_phone(old_phone, new_phone)
+    record.edit_phone(old_phone, new_phone)  # type: ignore
     return "Contact updated."
 
 
@@ -166,10 +165,7 @@ def handle_phone(book: AddressBook, name: str):
         str: The phone numbers or error message.
     """
     record = book.find(name)
-    if record is None:
-        return "Contact not found."
-
-    return f"{name}: {', '.join(phone.value for phone in record.phones)}"
+    return f"{name}: {', '.join(phone.value for phone in record.phones)}"  # type: ignore
 
 
 @input_error
@@ -189,7 +185,8 @@ def handle_all(book: AddressBook):
     result = []
     for record in book.data.values():
         phones = ', '.join(phone.value for phone in record.phones)
-        result.append(f"{record.name}: {phones}")
+        birthday = record.birthday if record.birthday else 'N/A'
+        result.append(f"name: {record.name}; phones: {phones}; birthday: {birthday}")
     return "\n- ".join(result)
 
 

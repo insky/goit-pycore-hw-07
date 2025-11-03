@@ -478,7 +478,7 @@ class TestHandlers(TestCaseWithMockDatetime):
     def test_handle_all_with_contacts(self):
         """Test listing all contacts."""
         result = handle_all(self.book)
-        self.assertIn("John: 1234567890", result)
+        self.assertIn("name: John; phones: 1234567890; birthday: N/A", result)
 
     def test_handle_all_empty_book(self):
         """Test listing all contacts when book is empty."""
