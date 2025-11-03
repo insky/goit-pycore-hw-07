@@ -258,7 +258,7 @@ class AddressBook(UserDict):
 
             congratulation_day = record.birthday.next_congratulation_date()
 
-            if 0 <= (congratulation_day - today).days < days_ahead:
+            if 0 <= (congratulation_day - today).days <= days_ahead:
                 upcoming_birthdays.append({
                     "name": record.name,
                     "congratulation_day": congratulation_day

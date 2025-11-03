@@ -534,6 +534,13 @@ class TestHandlers(TestCaseWithMockDatetime):
         result = handle_upcoming_birthdays(self.book)
         self.assertEqual(result, "No upcoming birthdays.")
 
+    @patch('address_book.datetime')
+    def test_handle_upcoming_birthdays_le(self, mock_datetime_class):
+        """Test showing upcoming birthdays when none."""
+        self._setup_datetime_mock(mock_datetime_class, 2025, 11, 3)
+        self.book.data["John"].add_birthday("8.11.2000")
+        result = handle_upcoming_birthdays(self.book)
+        self.assertEqual(result, "John: 10.11.2025")
 
 if __name__ == '__main__':
     unittest.main()
