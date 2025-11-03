@@ -19,7 +19,7 @@ def parse_input(user_input: str) -> tuple[str | None, list[str]]:
         return None, []
 
     cmd, *args = parts
-    return cmd, args
+    return cmd.lower(), args
 
 
 def input_error(func):
