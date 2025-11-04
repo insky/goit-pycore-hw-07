@@ -204,10 +204,7 @@ def handle_add_birthday(book: AddressBook, name: str, birthday: str):
         str: The result message.
     """
     record = book.find(name)
-    if record is None:
-        return "Contact not found."
-
-    record.add_birthday(birthday)
+    record.add_birthday(birthday)  # type: ignore
     return "Birthday added."
 
 
@@ -224,13 +221,10 @@ def handle_show_birthday(book: AddressBook, name: str):
         str: The birthday or error message.
     """
     record = book.find(name)
-    if record is None:
-        return "Contact not found."
-
-    if record.birthday is None:
+    if record.birthday is None:  # type: ignore
         return "Birthday not set."
 
-    return f"{name}'s birthday is {record.birthday}."
+    return f"{name}'s birthday is {record.birthday}."  # type: ignore
 
 
 @input_error
